@@ -3,7 +3,10 @@
     "allow": [
       "Bash(django-admin startproject:*)",
       "Bash(python manage.py startapp:*)",
-      "Bash(python -m django:*)"
+      "Bash(python -m django:*)",
+      "Bash(pip freeze:*)",
+      "Bash(cat:*)",
+      "Bash(django-admin:*)"
     ],
     "deny": [],
     "ask": []

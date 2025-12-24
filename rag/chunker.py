@@ -11,17 +11,21 @@ def load_docx(file_path: str) -> str:
     return text
 
 
-def chunk_text(text: str, chunk_size: int = 1500, overlap: int = 200) -> list:
+def chunk_text(text: str, chunk_size: int = 500, overlap: int = 100) -> list:
     """
     Matnni bo'laklarga bo'lish
 
     Args:
         text: Bo'laklarga bo'linadigan matn
-        chunk_size: Har bir bo'lak uzunligi (so'zlarda)
-        overlap: Bo'laklar orasidagi overlap (so'zlarda)
+        chunk_size: Har bir bo'lak uzunligi (so'zlarda) - optimal: 500
+        overlap: Bo'laklar orasidagi overlap (so'zlarda) - optimal: 100
 
     Returns:
         Bo'laklar ro'yxati
+
+    Optimallashtirilgan parametrlar:
+    - 500 so'zlik chunks: yaxshiroq semantic coherence
+    - 100 so'zlik overlap: kontekst davomiyligini saqlash
     """
     # Matnni paragraphlarga bo'lish
     paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
