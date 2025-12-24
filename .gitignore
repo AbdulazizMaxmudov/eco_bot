@@ -4,3 +4,19 @@
 __pycache__/
 *.pyc
 chroma_db/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python

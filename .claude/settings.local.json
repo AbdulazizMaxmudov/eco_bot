@@ -6,7 +6,10 @@
       "Bash(python -m django:*)",
       "Bash(pip freeze:*)",
       "Bash(cat:*)",
-      "Bash(django-admin:*)"
+      "Bash(django-admin:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
