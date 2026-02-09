@@ -17,16 +17,24 @@ collection = client.get_or_create_collection(
     metadata={"description": "Ekologik qoidalar"}
 )
 
+collection_ru = client.get_or_create_collection(
+    name="eco_rules_ru",
+    metadata={"description": "Экологические правила (рус)"}
+)
 
-def index_rules(file_path: str):
+
+def index_rules(file_path: str, lang: str = "uz"):
     """
     Rules faylni indekslash (vector DB ga yuklash)
+    lang: "uz" yoki "ru"
     """
+    target_collection = collection_ru if lang == "ru" else collection
+
     # Avvalgi ma'lumotlarni o'chirish
     try:
-        existing = collection.get()
+        existing = target_collection.get()
         if existing['ids']:
-            collection.delete(ids=existing['ids'])
+            target_collection.delete(ids=existing['ids'])
     except Exception:
         pass
 
@@ -42,32 +50,35 @@ def index_rules(file_path: str):
     embeddings = get_embeddings_batch(texts)
 
     # ChromaDB ga qo'shish
-    collection.add(
+    target_collection.add(
         ids=[chunk['id'] for chunk in chunks],
         embeddings=embeddings,
         documents=texts,
         metadatas=[chunk['metadata'] for chunk in chunks]
     )
 
-    print(f"{len(chunks)} ta chunk indekslandi!")
+    print(f"{len(chunks)} ta chunk indekslandi ({lang})!")
 
 
-def search(query: str, n_results: int = 3) -> list:
+def search(query: str, n_results: int = 3, lang: str = "uz") -> list:
     """
     Savol bo'yicha eng yaqin chunklar ni qidirish
 
     Args:
         query: Foydalanuvchi savoli
         n_results: Qaytariladigan natijalar soni
+        lang: Til - "uz" yoki "ru"
 
     Returns:
         [{text, score, metadata}, ...]
     """
+    target_collection = collection_ru if lang == "ru" else collection
+
     # Query embedding
     query_embedding = get_embedding(query)
 
     # Qidirish
-    results = collection.query(
+    results = target_collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results
     )
@@ -85,11 +96,11 @@ def search(query: str, n_results: int = 3) -> list:
     return formatted_results
 
 
-def get_context(query: str, n_results: int = 3) -> str:
+def get_context(query: str, n_results: int = 3, lang: str = "uz") -> str:
     """
     Savol uchun kontekst olish (GPT ga yuborish uchun)
     """
-    results = search(query, n_results)
+    results = search(query, n_results, lang)
 
     if not results:
         return ""

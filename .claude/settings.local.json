@@ -9,7 +9,12 @@
       "Bash(django-admin:*)",
       "Bash(git pull:*)",
       "Bash(git fetch:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(rename:*)",
+      "Bash(pip install:*)",
+      "Bash(venv/Scripts/python.exe -m pip:*)",
+      "Bash(venv/Scripts/python.exe:*)"
     ],
     "deny": [],
     "ask": []

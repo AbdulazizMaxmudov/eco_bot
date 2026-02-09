@@ -27,91 +27,150 @@ client = OpenAI(api_key=settings.OPENAI_API_KEY)
 # System prompt
 SYSTEM_PROMPT_LATIN = """Sen Ekologik ekspertiza markazi haqida ma'lumot beruvchi rasmiy yordamchi botsan.
 
-SENING ROLING:
-Men Ekologik ekspertiza markazi haqida ma'lumot beruvchi botman. Mening asosiy vazifam markazning vakolatlari, qonun-qoidalar, ekspertiza jarayonlari va talablar haqida to'liq va aniq ma'lumot berish.
+SENING VAZIFANG:
+Foydalanuvchi savollariga FAQAT quyidagi KONTEKST asosida to'liq, aniq va professional javob berish.
 
 JAVOB BERISH QOIDALARI:
-1. Foydalanuvchi savollariga FAQAT quyidagi KONTEKST asosida javob bering
-2. Kontekstdagi barcha ma'lumotlardan to'liq va batafsil foydalaning
-3. Javoblaringiz aniq, rasmiy va professional bo'lsin
-4. Ro'yxatlar, tartiblar, talablar bo'lsa - BARCHASINI to'liq sanab o'ting, hech narsani qisqartirmang
-5. Raqamlar, sanalar, summalar, manzillar va telefon raqamlariga alohida e'tibor bering
-6. Javobni FAQAT LOTIN alifbosida yozing (a-z harflari)
-
-BOT HAQIDA SAVOLLAR:
-Agar "Sen kimsan?", "Bot haqida", "Nimaga yordam berasan?", "Nima qila olasan?" kabi savollar bersa:
-→ "Men Ekologik ekspertiza markazi haqida ma'lumot beruvchi rasmiy botman. Sizga markazning vakolatlari, qonun-qoidalar, ekspertiza jarayonlari, hujjatlar ro'yxati, muddatlar va boshqa rasmiy ma'lumotlar haqida to'liq yordam bera olaman. Savolingizni bering!"
+1. FAQAT kontekstda bor ma'lumotlardan foydalaning
+2. Kontekstdagi BARCHA tegishli ma'lumotlarni to'liq sanab o'ting
+3. Ro'yxatlar, tartiblar, hujjatlar bo'lsa - HECH NARSA QOLDIRMAY barchasini yozing
+4. Raqamlar, sanalar, summalar, telefon raqamlarini AYNAN ko'rsating
+5. Javobingizni FAQAT LOTIN alifbosida yozing (a-z harflari)
 
 JAVOB TOPILMAGANDA:
-- Agar savol UMUMAN ekologiya, atrof-muhit, ekspertiza, qonun-qoidalar mavzusiga tegishli BO'LMASA → "JAVOB_TOPILMADI"
-- Agar kontekstda javob MAVJUD BO'LSA → faqat kontekst asosida javob bering, boshqa hech narsa qo'shmang
-- Agar kontekstda javob YO'Q BO'LSA → "Kechirasiz, bu savol bo'yicha aniq ma'lumot topilmadi. Mutaxassis bilan bog'laning: +998999999999"
+- Agar savol ekologiya, atrof-muhit, ekspertiza mavzusiga UMUMAN TEGISHLI BO'LMASA → "MAVZU_TASHQARI"
+- Agar savol mavzuga aloqador lekin kontekstda aniq javob YO'Q BO'LSA → "JAVOB_TOPILMADI"
 
-MUHIM ESLATMALAR:
-- Hech qachon o'ylab topib javob bermang, faqat kontekstdan foydalaning
-- Agar kontekstda aniq raqam, sana yoki summa bo'lsa, uni aynan ko'rsating
-- Javob berganingizdan keyin boshqa qo'shimcha ma'lumot qo'shmang
-- Faqat kontekstda bor narsani javob bering, ortiqcha gapirmang
-- Har doim do'stona, yordam beruvchi va professional bo'ling
+MUHIM:
+- Hech qachon o'ylab topib javob BERMANG
+- Kontekstdan tashqariga CHIQMANG
+- Shunchaki kontekstdagi ma'lumotni ANIQ va TO'LIQ yetkazing
 
-
-
-KONTEKST (Markazning rasmiy hujjatlaridan):
+KONTEKST (Rasmiy hujjatlardan):
 {context}
 """
 
 SYSTEM_PROMPT_CYRILLIC = """Сен Экологик экспертиза маркази ҳақида маълумот берувчи расмий ёрдамчи ботсан.
 
-СЕНИНГ РОЛИНГ:
-Мен Экологик экспертиза маркази ҳақида маълумот берувчи ботман. Менинг асосий вазифам марказнинг ваколатлари, қонун-қоидалар, экспертиза жараёнлари ва талаблар ҳақида тўлиқ ва аниқ маълумот бериш.
+СЕНИНГ ВАЗИФАНГ:
+Фойдаланувчи саволларига ФАҚАТ қуйидаги КОНТЕКСТ асосида тўлиқ, аниқ ва профессионал жавоб бериш.
 
 ЖАВОБ БЕРИШ ҚОИДАЛАРИ:
-1. Фойдаланувчи саволларига ФАҚАТ қуйидаги КОНТЕКСТ асосида жавоб беринг
-2. Контекстдаги барча маълумотлардан тўлиқ ва батафсил фойдаланинг
-3. Жавобларингиз аниқ, расмий ва профессионал бўлсин
-4. Рўйхатлар, тартиблар, талаблар бўлса - БАРЧАСИНИ тўлиқ санаб ўтинг, ҳеч нарсани қисқартирманг
-5. Рақамлар, саналар, суммалар, манзиллар ва телефон рақамларига алоҳида эътибор беринг
-6. Жавобни ФАҚАТ КИРИЛЛ алифбосида ёзинг
-
-БОТ ҲАҚИДА САВОЛЛАР:
-Агар "Сен кимсан?", "Бот ҳақида", "Нимага ёрдам бераcан?", "Нима қила оласан?" каби саволлар берса:
-→ "Мен Экологик экспертиза маркази ҳақида маълумот берувчи расмий ботман. Сизга марказнинг ваколатлари, қонун-қоидалар, экспертиза жараёнлари, ҳужжатлар рўйхати, муддатлар ва бошқа расмий маълумотлар ҳақида тўлиқ ёрдам бера оламан. Саволингизни беринг!"
+1. ФАҚАТ контекстда бор маълумотлардан фойдаланинг
+2. Контекстдаги БАРЧА тегишли маълумотларни тўлиқ санаб ўтинг
+3. Рўйхатлар, тартиблар, ҳужжатлар бўлса - ҲЕЧ НАРСА ҚОЛДИРМАЙ барчасини ёзинг
+4. Рақамлар, саналар, суммалар, телефон рақамларини АЙНАН кўрсатинг
+5. Жавобингизни ФАҚАТ КИРИЛЛ алифбосида ёзинг
 
 ЖАВОБ ТОПИЛМАГАНДА:
-- Агар савол УМУМАН экология, атроф-муҳит, экспертиза, қонун-қоидалар мавзусига тегишли БЎЛМАСА → "ЖАВОБ_ТОПИЛМАДИ"
-- Агар контекстда жавоб МАВЖУД БЎЛСА → фақат контекст асосида жавоб беринг, бошқа ҳеч нарса қўшманг
-- Агар контекстда жавоб ЙЎҚ БЎЛСА → "Кечирасиз, бу савол бўйича аниқ маълумот топилмади. Мутахассис билан боғланинг: +998999999999"
+- Агар савол экология, атроф-муҳит, экспертиза мавзусига УМУМАН ТЕГИШЛИ БЎЛМАСА → "МАВЗУ_ТАШҚАРИ"
+- Агар савол мавзуга алоқадор лекин контекстда аниқ жавоб ЙЎҚ БЎЛСА → "ЖАВОБ_ТОПИЛМАДИ"
 
-МУҲИМ ЭСЛАТМАЛАР:
-- Ҳеч қачон ўйлаб топиб жавоб берманг, фақат контекстдан фойдаланинг
-- Агар контекстда аниқ рақам, сана ёки сумма бўлса, уни айнан кўрсатинг
-- Жавоб берганингиздан кейин бошқа қўшимча маълумот қўшманг
-- Фақат контекстда бор нарсани жавоб беринг, ортиқча гапирманг
-- Ҳар доим дўстона, ёрдам берувчи ва профессионал бўлинг
+МУҲИМ:
+- Ҳеч қачон ўйлаб топиб жавоб БЕРМАНГ
+- Контекстдан ташқарига ЧИҚМАНГ
+- Шунчаки контекстдаги маълумотни АНИҚ ва ТЎЛИҚ етказинг
 
-КОНТЕКСТ (Марказнинг расмий ҳужжатларидан):
+КОНТЕКСТ (Расмий ҳужжатлардан):
+{context}
+"""
+
+SYSTEM_PROMPT_RUSSIAN = """Ты официальный бот-помощник Центра государственной экологической экспертизы, предоставляющий информацию.
+
+ТВОЯ ЗАДАЧА:
+Отвечать на вопросы пользователей ТОЛЬКО на основе приведённого ниже КОНТЕКСТА — полно, точно и профессионально.
+
+ПРАВИЛА ОТВЕТА:
+1. Используйте ТОЛЬКО информацию из контекста
+2. Перечислите ВСЮ соответствующую информацию из контекста полностью
+3. Если есть списки, процедуры, документы — напишите ВСЁ БЕЗ ПРОПУСКОВ
+4. Указывайте ТОЧНЫЕ цифры, даты, суммы, номера телефонов
+5. Пишите ответ ТОЛЬКО на РУССКОМ языке
+
+КОГДА ОТВЕТ НЕ НАЙДЕН:
+- Если вопрос ВООБЩЕ НЕ ОТНОСИТСЯ к теме экологии, окружающей среды, экспертизы → "MAVZU_TASHQARI"
+- Если вопрос по теме, но в контексте НЕТ точного ответа → "JAVOB_TOPILMADI"
+
+ВАЖНО:
+- Никогда НЕ ВЫДУМЫВАЙТЕ ответы
+- НЕ ВЫХОДИТЕ за рамки контекста
+- Просто ТОЧНО и ПОЛНО передайте информацию из контекста
+
+КОНТЕКСТ (Из официальных документов):
 {context}
 """
 
 
 def detect_alphabet(text: str) -> str:
-    """Matnning alifbosini aniqlash"""
+    """Matnning alifbosini aniqlash: 'latin', 'cyrillic' (o'zbek), 'russian'"""
     cyrillic_count = 0
     latin_count = 0
+    uzbek_specific = 0
+
+    # O'zbek kirilliga xos harflar
+    uzbek_chars = set('ўқғҳЎҚҒҲ')
 
     for char in text:
-        if '\u0400' <= char <= '\u04FF':  # Cyrillic range
+        if char in uzbek_chars:
+            uzbek_specific += 1
+            cyrillic_count += 1
+        elif '\u0400' <= char <= '\u04FF':  # Cyrillic range
             cyrillic_count += 1
         elif 'a' <= char.lower() <= 'z':  # Latin range
             latin_count += 1
 
-    return 'cyrillic' if cyrillic_count > latin_count else 'latin'
+    if cyrillic_count > latin_count:
+        # O'zbek kirilimi yoki rusmi?
+        return 'cyrillic' if uzbek_specific > 0 else 'russian'
+    return 'latin'
 
-NOT_FOUND_MESSAGE_LATIN = """Kechirasiz, bu savolga javob bera olmayman.
-Iltimos, mutaxassis bilan bog'laning: +998999999999"""
+OFF_TOPIC_MESSAGE_LATIN = """Kechirasiz, men faqat O'zbekiston Respublikasi Vazirlar Mahkamasining 2020 yil 7 sentabrdagi 541-son qarori doirasida ma'lumot bera olaman.
 
-NOT_FOUND_MESSAGE_CYRILLIC = """Кечирасиз, бу саволга жавоб бера олмайман.
-Илтимос, мутахассис билан боғланинг: +998999999999"""
+Iltimos, savolingizni shu qaror mazmuniga oid qilib bering."""
+
+OFF_TOPIC_MESSAGE_CYRILLIC = """Кечирасиз, мен фақат Ўзбекистон Республикаси Вазирлар Маҳкамасининг 2020 йил 7 сентябрдаги 541-сон қарори доирасида маълумот бера оламан.
+
+Илтимос, саволингизни шу қарор мазмунига оид қилиб беринг."""
+
+OFF_TOPIC_MESSAGE_RUSSIAN = """Извините, я могу предоставлять информацию только в рамках Постановления Кабинета Министров Республики Узбекистан №541 от 7 сентября 2020 года.
+
+Пожалуйста, задайте вопрос по содержанию данного постановления."""
+
+NOT_FOUND_MESSAGE_LATIN = """Kechirasiz, ushbu savol Vazirlar Mahkamasining
+2020 yil 7 sentabrdagi 541-son qarori doirasiga kirmaydi.
+
+Mazkur masala bo'yicha to'liq va aniq ma'lumot olish uchun
+Davlat ekologik ekspertizasi markazi mutaxassislariga
+bevosita murojaat qilishingiz mumkin:
+
+📞 Qisqa raqam: 1392
+☎️ Telefon: 71 203 03 04
+
+Mutaxassislar sizga to'liq ma'lumot va tushuntirish beradilar."""
+
+NOT_FOUND_MESSAGE_CYRILLIC = """Кечирасиз, ушбу савол Вазирлар Маҳкамасининг
+2020 йил 7 сентябрдаги 541-сон қарори доирасига кирмайди.
+
+Мазкур масала бўйича тўлиқ ва аниқ маълумот олиш учун
+Давлат экологик экспертизаси маркази мутахассисларига
+бевосита мурожаат қилишингиз мумкин:
+
+📞 Қисқа рақам: 1392
+☎️ Телефон: 71 203 03 04
+
+Мутахассислар сизга тўлиқ маълумот ва тушунтириш берадилар."""
+
+NOT_FOUND_MESSAGE_RUSSIAN = """Извините, данный вопрос не входит в рамки Постановления
+Кабинета Министров №541 от 7 сентября 2020 года.
+
+Для получения полной и точной информации по данному вопросу
+вы можете обратиться напрямую к специалистам
+Центра государственной экологической экспертизы:
+
+📞 Короткий номер: 1392
+☎️ Телефон: 71 203 03 04
+
+Специалисты предоставят вам полную информацию и разъяснения."""
 
 
 @sync_to_async
@@ -205,13 +264,19 @@ def get_costs_stats():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start buyrug'i"""
     # User ni saqlash
-    get_or_create_user(update.effective_user)
+    await get_or_create_user(update.effective_user)
 
     await update.message.reply_text(
-        "Assalomu alaykum!\n"
-        "Men Ekologik ekspertiza markazi haqida ma'lumot beruvchi botman.\n"
-        "Sizga qonun-qoidalar, vakolatlar va tartiblar haqida yordam bera olaman.\n"
-        "Savolingizni yozing!"
+        "Ассалому алайкум! \n\n"
+        "Мен Давлат экологик экспертизаси марказининг\n"
+        "сунъий интеллектга асосланган ахборот ассистентиман.\n\n"
+        "Мен сизга Ўзбекистон Республикаси Вазирлар Маҳкамасининг\n"
+        "2020 йил 7 сентябрдаги 541-сон қарори\n"
+        "доирасида маълумот ва тушунтиришлар бераман.\n\n"
+        "✍️ Саволингизни 541-сон қарор мазмуни бўйича ёзинг.\n\n"
+        "⚠️ Агар саволингиз бошқа мавзуда бўлса,\n"
+        "илтимос, Марказнинг қисқа рақамига мурожаат қилинг:\n"
+        "📞 1392"
     )
 
 
@@ -220,50 +285,149 @@ async def answer_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     user = await get_or_create_user(update.effective_user)
 
-    # Kutish xabarini yuborish
-    waiting_message = await update.message.reply_text("⏳ Iltimos kuting, javob tayyorlanmoqda...")
+    # Alifboni aniqlash
+    alphabet = detect_alphabet(user_message)
+
+    # Kutish xabarini tilga qarab yuborish
+    waiting_messages = {
+        'latin': "⏳ Iltimos kuting, javob tayyorlanmoqda...",
+        'cyrillic': "⏳ Илтимос кутинг, жавоб тайёрланмоқда...",
+        'russian': "⏳ Пожалуйста, подождите, ответ готовится...",
+    }
+    waiting_message = await update.message.reply_text(waiting_messages[alphabet])
 
     try:
-        # Alifboni aniqlash
-        alphabet = detect_alphabet(user_message)
 
-        # RAG dan kontekst olish (optimallashtirilgan)
-        rag_context = get_context(user_message, n_results=5)
+        # Salomlashuvlarni aniqlash
+        greetings_latin = ["salom", "assalom", "hayrli kun", "xayrli kun", "hello"]
+        greetings_cyrillic = ["салом", "ассалом", "хайрли кун"]
+        greetings_russian = ["привет", "здравствуйте", "добрый день", "доброе утро", "добрый вечер", "здравствуй"]
+
+        user_lower = user_message.lower().strip()
+        is_greeting = any(q in user_lower for q in (greetings_cyrillic + greetings_latin + greetings_russian))
+
+        # Bot haqida savollarni to'g'ridan-to'g'ri qayta ishlash
+        bot_questions_cyrillic = ["сен кимсан", "бот ҳақида", "нимага ёрдам", "нима қила оласан", "сиз кимсиз", "нима билесиз"]
+        bot_questions_latin = ["sen kimsan", "bot haqida", "nimaga yordam", "nima qila olasan", "siz kimsiz", "nima bilasiz"]
+        bot_questions_russian = ["кто ты", "что ты умеешь", "что ты можешь", "чем помочь", "о боте", "что за бот"]
+
+        is_bot_question = any(q in user_lower for q in (bot_questions_cyrillic + bot_questions_latin + bot_questions_russian))
+
+        if is_greeting or is_bot_question:
+            # Salomlashuvga javob + bot taqdimoti
+            if alphabet == 'russian':
+                greeting_text = "Здравствуйте! 😊\n\n" if is_greeting else ""
+                bot_answer = f"""{greeting_text}Я официальный бот Центра государственной экологической экспертизы.
+
+Я могу предоставить вам информацию по следующим темам:
+✅ Полномочия и задачи Центра
+✅ Содержание и требования Постановления №541
+✅ Процесс экологической экспертизы
+✅ Перечень необходимых документов
+✅ Сроки и оплата
+✅ Контактная информация
+
+Задавайте ваш вопрос! 😊"""
+            elif alphabet == 'cyrillic':
+                greeting_text = "Ваалайкум ассалом! 😊\n\n" if is_greeting else ""
+                bot_answer = f"""{greeting_text}Мен Давлат экологик экспертизаси марказининг расмий ботиман.
+
+Мен сизга қуйидаги мавзулар бўйича маълумот бера оламан:
+✅ Марказнинг ваколатлари ва вазифалари
+✅ 541-сон қарор мазмуни ва талаблари
+✅ Экологик экспертиза жараёни
+✅ Керакли ҳужжатлар рўйхати
+✅ Муддатлар ва тўловлар
+✅ Алоқа маълумотлари
+
+Саволингизни беринг! 😊"""
+            else:
+                greeting_text = "Vaalaykum assalom! 😊\n\n" if is_greeting else ""
+                bot_answer = f"""{greeting_text}Men Davlat ekologik ekspertizasi markazining rasmiy botiman.
+
+Men sizga quyidagi mavzular bo'yicha ma'lumot bera olaman:
+✅ Markazning vakolatlari va vazifalari
+✅ 541-son qaror mazmuni va talablari
+✅ Ekologik ekspertiza jarayoni
+✅ Kerakli hujjatlar ro'yxati
+✅ Muddatlar va to'lovlar
+✅ Aloqa ma'lumotlari
+
+Savolingizni bering! 😊"""
+
+            # Kutish xabarini o'chirish
+            await waiting_message.delete()
+            await update.message.reply_text(bot_answer)
+
+            # DB ga saqlash
+            await save_conversation(
+                user=user,
+                question=user_message,
+                answer=bot_answer,
+                input_tokens=0,
+                output_tokens=0,
+                total_tokens=0,
+                cost=Decimal('0'),
+                status='answered',
+                source_chunks="Salomlashuv yoki bot haqida savol - to'g'ridan-to'g'ri javob"
+            )
+            return
+
+        # RAG dan kontekst olish (alifboga qarab tilni tanlash)
+        rag_lang = "ru" if alphabet == "russian" else "uz"
+        rag_context = get_context(user_message, n_results=10, lang=rag_lang)
         source_chunks = rag_context if rag_context else "Kontekst topilmadi"
 
         # System prompt tayyorlash (alifboga qarab)
-        if alphabet == 'cyrillic':
+        if alphabet == 'russian':
+            system_prompt = SYSTEM_PROMPT_RUSSIAN.format(context=rag_context if rag_context else "Информация не найдена")
+        elif alphabet == 'cyrillic':
             system_prompt = SYSTEM_PROMPT_CYRILLIC.format(context=rag_context if rag_context else "Маълумот топилмади")
         else:
             system_prompt = SYSTEM_PROMPT_LATIN.format(context=rag_context if rag_context else "Ma'lumot topilmadi")
 
-        # GPT ga yuborish
+        # GPT ga yuborish (yaxshilangan model va parametrlar)
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",      # Eng aniq model
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.2,     # Aniqroq javoblar uchun
-            max_tokens=3000,     # Uzunroq javoblar uchun
-            top_p=0.9,           # Diversity control
-            frequency_penalty=0.3,  # Takrorlanishni kamaytirish
-            presence_penalty=0.1    # Topic diversity
+            temperature=0.1,     # Minimal randomness - maksimal aniqlik
+            max_tokens=4000,     # Ko'proq joy javob uchun
+            top_p=0.95,          # Eng yuqori ehtimollik
+            frequency_penalty=0.2,  # Takrorlanishni kamaytirish
+            presence_penalty=0.0    # Faqat kontekstga asoslangan javob
         )
 
         answer = response.choices[0].message.content
 
-        # Token va narx hisoblash
+        # Token va narx hisoblash (GPT-4o narxlari)
         usage = response.usage
         input_tokens = usage.prompt_tokens
         output_tokens = usage.completion_tokens
         total_tokens = usage.total_tokens
-        cost = Decimal(str((input_tokens * 0.15 / 1_000_000) + (output_tokens * 0.60 / 1_000_000)))
+        # GPT-4o: $2.50 per 1M input tokens, $10.00 per 1M output tokens
+        cost = Decimal(str((input_tokens * 2.50 / 1_000_000) + (output_tokens * 10.00 / 1_000_000)))
 
         # Status aniqlash
-        if "JAVOB_TOPILMADI" in answer or "ЖАВОБ_ТОПИЛМАДИ" in answer:
+        off_topic_messages = {
+            'russian': OFF_TOPIC_MESSAGE_RUSSIAN,
+            'cyrillic': OFF_TOPIC_MESSAGE_CYRILLIC,
+            'latin': OFF_TOPIC_MESSAGE_LATIN,
+        }
+        not_found_messages = {
+            'russian': NOT_FOUND_MESSAGE_RUSSIAN,
+            'cyrillic': NOT_FOUND_MESSAGE_CYRILLIC,
+            'latin': NOT_FOUND_MESSAGE_LATIN,
+        }
+
+        if "MAVZU_TASHQARI" in answer or "МАВЗУ_ТАШҚАРИ" in answer:
             status = 'not_found'
-            answer = NOT_FOUND_MESSAGE_CYRILLIC if alphabet == 'cyrillic' else NOT_FOUND_MESSAGE_LATIN
+            answer = off_topic_messages[alphabet]
+        elif "JAVOB_TOPILMADI" in answer or "ЖАВОБ_ТОПИЛМАДИ" in answer:
+            status = 'not_found'
+            answer = not_found_messages[alphabet]
         else:
             status = 'answered'
 
